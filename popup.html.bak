@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mijn Extensie</title>
+  </head>
+  <body>
+    <h3>Hallo wereld!</h3>
+    <input type="input"></input>
+	<button id="knop">Klik mij</button>
+    <script src="popup.js"></script>
+  </body>
+</html>

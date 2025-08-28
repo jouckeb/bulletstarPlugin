@@ -1,0 +1,30 @@
+console.log("Content script geladen op deze pagina!");
+chrome.storage.sync.get("mijnWaarde", (data) => {
+  if (!data.mijnWaarde) return;
+
+  const waarde = data.mijnWaarde.replace(/[^\d]/g, ""); 
+  const grens = parseInt(waarde, 10);
+  
+  // Alle tabelrijen pakken
+  const rows = document.querySelectorAll("tr.trSo");
+
+  rows.forEach((row) => {
+    const schildjeCell  = row.querySelector("td:nth-child(2)");
+	const heeftSchildje = schildjeCell && schildjeCell.querySelector("img") !== null;
+	if (heeftSchildje) return;
+	  
+    const targetCell = row.querySelector("td:nth-child(4)");
+    if (!targetCell) return;
+
+ 
+    const rawText = targetCell.textContent.trim();
+    const clean = rawText.replace(/[^\d]/g, ""); 
+
+    const waarde = parseInt(clean, 10);
+	
+    if (waarde < grens) {
+	  const targetCell = row.querySelector("td:nth-child(5)");
+      targetCell.style.setProperty("background-color", "193, 224, 186", "important");
+    }
+  });
+});

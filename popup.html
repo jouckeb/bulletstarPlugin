@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Input Extensie</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <h3>Voer iets in:</h3>
+  <input type="text" id="mijnInput" placeholder="Typ hier...">
+
+  <div class="check-row">
+    <label for="autoCaptcha">Vul Captcha automatisch (Beta)</label>
+    <input type="checkbox" id="captchaCheck" name="autoCaptcha" value="1">
+  </div>
+
+  <label for="autoLevel">Automatisch levelen (Beta)</label>
+  <select name="autoLevel" id="autoLevel">
+    <option value="Tikkie">Tikkie</option>
+    <option value="Keld">Keld</option>
+    <option value="Moord">Moord</option>
+  </select>
+
+  <button id="opslaanBtn">Opslaan</button>
+  <p id="status"></p>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
