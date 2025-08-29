@@ -1,3 +1,7 @@
+const TIKKIE = '7';
+const KELD = '8';
+const MOORD = '6';
+
 chrome.storage.sync.get("power", (data) => {
   if (!data.power) return;
 
@@ -58,7 +62,55 @@ function autoFillCaptcha() {
 }
 
 function autoCrime() {
+    if (! window.location.href.endsWith('crimes')) return;
 
+    chrome.storage.sync.get(['autoLevel', 'autoLevelCheck'], (data) => {
+        if (data.autoLevelCheck === 'boolean' && data.autoLevelCheck === false) return;
+
+        let callback = null;
+        switch (data.autoLevel) {
+            case TIKKIE:
+                callback = autoTikkie;
+                break;
+            case KELD:
+                callback = autoKeld;
+                break;
+            case MOORD:
+                callback = autoMoord;
+                break;
+        }
+
+        if (callback !== null) {
+            window.setInterval(callback, Math.floor(Math.random() * 3000) + 1000);
+        }
+    });
+}
+
+function autoFillPower() {
+    if (! window.location.href.includes('profile')) return;
+
+    const rows = document.querySelectorAll("tr");
+
+    let i = 0;
+    rows.forEach((row) => {
+        const valueCol = row.querySelector("img[src=\"./bulletstar-icons/shield.png\"]");
+        if (valueCol === null) {
+            return;
+        }
+
+        i++;
+
+        if (i === 3) {
+            const powerHTML = valueCol.closest('tr').children.item(2).innerHTML,
+                  powerValue = powerHTML.substring(0, powerHTML.indexOf(' ')).trim();
+
+            chrome.storage.sync.set({ power: powerValue }, () => {
+                console.log('Power value aangepast naar ' + powerValue)
+            });
+        }
+    })
 }
 
 window.addEventListener("load", autoFillCaptcha);
+window.addEventListener('load', autoCrime);
+window.addEventListener('load', autoFillPower);

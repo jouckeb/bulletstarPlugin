@@ -8,24 +8,30 @@
 
 <body>
   <h3>Voer iets in:</h3>
-  <input type="text" id="mijnInput" placeholder="Typ hier...">
+  <input type="text" id="powerInput" placeholder="Typ hier...">
 
   <div class="check-row">
-    <label for="autoCaptcha">Vul Captcha automatisch (Beta)</label>
+    <label for="captchaCheck">Vul Captcha automatisch (Beta)</label>
     <input type="checkbox" id="captchaCheck" name="autoCaptcha" value="1">
   </div>
 
-  <label for="autoLevel">Automatisch levelen (Beta)</label>
+  <div class="check-row">
+      <label for="autoLevelCheckBox">Automatisch levelen (Beta)</label>
+      <input type="checkbox" id="autoLevelCheckBox" name="autoLevel" value="1">
+  </div>
+
   <select name="autoLevel" id="autoLevel">
-    <option value="Tikkie">Tikkie</option>
-    <option value="Keld">Keld</option>
-    <option value="Moord">Moord</option>
+      <option disabled selected value> -- select an option -- </option>
+      <option value="7">Tikkie</option>
+      <option value="8">Keld</option>
+      <option value="6">Moord</option>
   </select>
 
-  <button id="opslaanBtn">Opslaan</button>
+
+  <button id="saveSettingsButton">Opslaan</button>
   <p id="status"></p>
 
-  <script src="popup.js"></script>
+  <script src="js/popup.js"></script>
 </body>
 
 </html>

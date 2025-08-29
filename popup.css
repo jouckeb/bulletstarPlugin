@@ -54,7 +54,7 @@ h3{
 }
 
 /* Kaart look rondom de form elementen */
-#opslaanBtn, #mijnInput, label, #status{
+#saveSettingsButton, #powerInput, label, #status{
   font-size:14px;
 }
 #status{
@@ -64,8 +64,8 @@ h3{
 
 /* Groepering & spacing */
 input[type="text"],
-label[for="oudLogo"], label[for="captchaCheck"],
-#opslaanBtn{
+label[for="captchaCheck"],
+#saveSettingsButton{
   display:block;
   width:100%;
 }
@@ -145,7 +145,7 @@ label[for="oudLogo"], label[for="captchaCheck"]{
 }
 
 /* Opslaan-knop: ‘red alert’ met goud-hover */
-#opslaanBtn{
+#saveSettingsButton{
   margin-top:14px;
   padding:11px 14px;
   border:1px solid #5a0f0d;
