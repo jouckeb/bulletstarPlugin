@@ -19,3 +19,21 @@
 #header3 a.logo { background: url('https://bulletstarclassic.nl/img/4/bg/logo-bulletstar-3.png') !important; }
 #header4 a.logo { background: url('https://bulletstarclassic.nl/img/4/bg/logo-bulletstar-4.png') !important; }
 #header5 a.logo { background: url('https://bulletstarclassic.nl/img/4/bg/logo-bulletstar-5.png') !important; }
+
+.solveButton {
+    border: 2px rgba(43, 43, 43, 1) solid;
+    box-shadow: inset 0px 0px 0px rgba(0, 0, 0, 0);
+    font-weight: normal;
+    font-family: "Noto Sans", sans-serif;
+    font-size: 11px;
+    color: #eee8e5;
+    background: #111;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 6px;
+    padding-right: 6px;
+    cursor: pointer;
+}
