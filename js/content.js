@@ -34,31 +34,103 @@ chrome.storage.sync.get("power", (data) => {
   });
 });
 
+let captchaCache = JSON.parse(localStorage.getItem("captchaCache") || "{}");
 
-function autoFillCaptcha() {
-  chrome.storage.sync.get("autoCaptcha", (data) => {
-    const autoCaptcha = data.autoCaptcha;
+async function getBase64DataUrl(imgElement) {
+    const canvas = document.createElement("canvas");
+    canvas.width = imgElement.width;
+    canvas.height = imgElement.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(imgElement, 0, 0);
+    return canvas.toDataURL("image/png");
+}
 
-    if (!autoCaptcha) {
-      return;
-    }
+//voor mass toevoegen op de code.php pagina
+async function ezCaptcha() {
+    const img = document.querySelector("img");
+    const dataUrl = await getBase64DataUrl(img);
 
-    const img = document.querySelector("#captchaImage");
-    const input = document.querySelector('input[name="code"]');
-    if (!img || !input) return;
-
-
-    Tesseract.recognize(img, "eng", { tessedit_char_whitelist: "0123456789" }).then(({ data: { text } }) => {
-      const clean = text.replace(/[^a-zA-Z0-9]/g, "").trim();
-      if (clean) {
-        input.value = clean;
-        console.log("Captcha herkend en ingevuld:", clean);
-      } else {
-        console.log("Geen geldige captcha herkend.");
-      }
+    const response = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${API_KEY}`,
+        },
+        body: JSON.stringify({
+            model: "gpt-5-nano",
+            input: [
+                {
+                    role: "user",
+                    content: [
+                        { type: "input_text", text: "Lees de code in deze afbeelding, geef de code terug als alleen de cijfers." },
+                        { type: "input_image", image_url: dataUrl },
+                    ],
+                },
+            ],
+        }),
     });
 
-  });
+    const result = await response.json();
+    console.log("Gelezen captcha:", result?.output?.[1]?.content?.[0]?.text);
+
+    captchaCache[dataUrl] = result?.output?.[1]?.content?.[0]?.text;
+    localStorage.setItem("captchaCache", JSON.stringify(captchaCache));
+
+    window.location.reload();
+}
+
+async function autoFillCaptcha() {
+     chrome.storage.sync.get("autoCaptcha", async (data) => {
+        const autoCaptcha = data.autoCaptcha;
+
+        if (!autoCaptcha) {
+            return;
+        }
+
+        const img = document.querySelector("#captchaImage");
+        const input = document.querySelector('input[name="code"]');
+        if (!img || !input) return;
+
+        const dataUrl = await getBase64DataUrl(img);
+
+        if (captchaCache[dataUrl]) {
+            console.log("Captcha uit cache:", captchaCache[dataUrl]);
+            input.value = captchaCache[dataUrl];
+            return;
+        }
+
+        const response = await fetch("https://api.openai.com/v1/responses", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${API_KEY}`,
+            },
+            body: JSON.stringify({
+                model: "gpt-5-nano",
+                input: [
+                    {
+                        role: "user",
+                        content: [
+                            {
+                                type: "input_text",
+                                text: "Lees de code in deze afbeelding, geef de code terug als alleen de cijfers."
+                            },
+                            {type: "input_image", image_url: dataUrl},
+                        ],
+                    },
+                ],
+            }),
+        });
+
+        const result = await response.json();
+        const text = result?.output?.[1]?.content?.[0]?.text || "";
+        console.log("Gelezen captcha:", text);
+
+        input.value = text;
+
+        captchaCache[dataUrl] = text;
+        localStorage.setItem("captchaCache", JSON.stringify(captchaCache));
+    })
 }
 
 function autoCrime() {
@@ -111,6 +183,30 @@ function autoFillPower() {
     })
 }
 
-window.addEventListener("load", autoFillCaptcha);
+function addCaptchaButton() {
+    chrome.storage.sync.get("autoCaptcha", (data) => {
+        const autoCaptcha = data.autoCaptcha;
+
+        if (!autoCaptcha) {
+            return;
+        }
+        const img = document.querySelector("#captchaImage");
+        const input = document.querySelector('input[name="code"]');
+        if (!img || !input) return;
+
+        const button = document.createElement("button");
+        button.textContent = "solve";
+        button.className = "solveButton";
+        button.type = "button";
+
+        button.onclick = () => autoFillCaptcha();
+
+        input.insertAdjacentElement("afterend", button);
+    })
+}
+
+
 window.addEventListener('load', autoCrime);
+window.addEventListener('load', autoFillCaptcha);
+window.addEventListener('load', addCaptchaButton);
 window.addEventListener('load', autoFillPower);
