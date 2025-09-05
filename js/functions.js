@@ -27,7 +27,7 @@ function autoKeld() {
 }
 
 function autoMoord() {
-    const tikkieRadioButton = document.getElementById(KELD),
+    const tikkieRadioButton = document.getElementById(MOORD),
         submitButtons = document.querySelectorAll('input[type=submit]');
 
     if (tikkieRadioButton === null || tikkieRadioButton === 'undefined') {
