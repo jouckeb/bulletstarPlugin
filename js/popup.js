@@ -46,6 +46,16 @@ button.addEventListener("click", () => {
     });
 });
 
+function downloadCaptchaCache() {
+    const blob = new Blob([JSON.stringify(captchaCache, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "captcha_cache.json";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
 autoLevelCheckbox.addEventListener('change', () => {
     autoLevel.style.display = autoLevelCheckbox.checked ? 'block' : 'none';
 });
