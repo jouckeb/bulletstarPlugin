@@ -16,7 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const cache = data.captchaCache || {};
             tableBody.innerHTML = "";
 
-            for (const [hash, entry] of Object.entries(cache)) {
+            const sortedEntries = Object.entries(cache).sort((a, b) => {
+                return Number(a[1].code) - Number(b[1].code);
+            });
+
+            for (const [hash, entry] of sortedEntries) {
                 const tr = document.createElement("tr");
 
                 // Thumbnail
@@ -30,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const input = document.createElement("input");
                 input.type = "text";
                 input.value = entry.code;
-                input.className = "form-control form-control-sm";
+                input.className = "form-control form-control-sm text-center";
                 tdCode.appendChild(input);
 
                 // Acties
