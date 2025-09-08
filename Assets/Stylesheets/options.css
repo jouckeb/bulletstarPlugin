@@ -1,0 +1,24 @@
+body{
+    background-image: url("../Images/bgSM2025.jpg");
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+img {
+    max-width: 150px;
+    height: auto;
+}
+input {
+    width: 100px;
+}
+button {
+    margin-top: 10px;
+}
