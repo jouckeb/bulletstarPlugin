@@ -12,11 +12,11 @@ chrome.storage.sync.get("power", (data) => {
 
   rows.forEach((row) => {
     const speler = row.querySelector("td:nth-child(2)");
-    const heeftSchildje = speler && speler.querySelector('img[src="./bulletstar-icons/shield_add.png"]') !== null;
-    const familie = speler.querySelector('img[src="bulletstar-icons/user_green.png"]') !== null;
+    const isProtected = speler && speler.querySelector('img[src="./bulletstar-icons/shield_add.png"]') !== null;
+    const family = speler.querySelector('img[src="bulletstar-icons/user_green.png"]') !== null;
 
-    if (heeftSchildje) return;
-    if (familie) return;
+    if (isProtected) return;
+    if (family) return;
 
     const targetCell = row.querySelector("td:nth-child(4)");
     if (!targetCell) return;
@@ -34,7 +34,6 @@ chrome.storage.sync.get("power", (data) => {
   });
 });
 
-// Converteer afbeelding naar base64
 async function getBase64DataUrl(imgElement) {
     const canvas = document.createElement("canvas");
     canvas.width = imgElement.width;
@@ -44,7 +43,6 @@ async function getBase64DataUrl(imgElement) {
     return canvas.toDataURL("image/png");
 }
 
-// Maak thumbnail (bijv. 50x50 px)
 function getThumbnail(dataUrl) {
     return new Promise((resolve) => {
         const img = new Image();
@@ -60,7 +58,6 @@ function getThumbnail(dataUrl) {
     });
 }
 
-// SHA-256 hash van base64
 async function hashDataUrl(dataUrl) {
     const data = dataUrl.split(",")[1];
     const byteStr = atob(data);
@@ -71,7 +68,6 @@ async function hashDataUrl(dataUrl) {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Hoofdfunctie
 async function autoFillCaptcha() {
     chrome.storage.sync.get("autoCaptcha", async (data) => {
         if (!data.autoCaptcha) return;
