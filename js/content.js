@@ -152,7 +152,9 @@ function autoCrime() {
 }
 
 function autoFillPower() {
-    if (! window.location.href.includes('profile')) return;
+
+    let href = document.querySelector(".logo").getAttribute("href");
+    if (window.location.href !== href) return;
 
     const rows = document.querySelectorAll("tr");
 
