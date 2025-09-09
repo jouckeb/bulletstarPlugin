@@ -152,7 +152,9 @@ function autoCrime() {
 }
 
 function autoFillPower() {
-    if (! window.location.href.includes('profile')) return;
+
+    let href = document.querySelector(".logo").getAttribute("href");
+    if (window.location.href !== href) return;
 
     const rows = document.querySelectorAll("tr");
 
@@ -199,6 +201,7 @@ function addCaptchaButton() {
 }
 
 window.addEventListener('load', autoCrime);
+// window.addEventListener('load', autoJailbreak);
 window.addEventListener('load', autoFillCaptcha);
 window.addEventListener('load', addCaptchaButton);
 window.addEventListener('load', autoFillPower);
