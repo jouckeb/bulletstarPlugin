@@ -1,37 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 
 <head>
-  <title>Input Extensie</title>
-  <link rel="stylesheet" href="popup.css">
+    <title>Input Extensie</title>
+    <script src="Assets/Js/fontawesome.js"></script>
+    <script src="Assets/Js/boostrap.js"></script>
+    <link rel="stylesheet" href="Assets/Stylesheets/boostrap.css">
+    <link rel="stylesheet" href="Assets/Stylesheets/popup.css">
 </head>
 
 <body>
-  <h3>Voer iets in:</h3>
-  <input type="text" id="powerInput" placeholder="Typ hier...">
-
-  <div class="check-row">
+<div class="d-flex align-items-center justify-content-between">
+    <h3 class="m-0">Voer iets in:</h3>
+    <span id="openOptions"><i class="fa-solid fa-gear"></i></span>
+</div>
+<br>
+<input type="text" id="powerInput" placeholder="Typ hier...">
+<div class="check-row">
     <label for="captchaCheck">Vul Captcha automatisch (Beta)</label>
     <input type="checkbox" id="captchaCheck" name="autoCaptcha" value="1">
-  </div>
+</div>
 
-  <div class="check-row">
-      <label for="autoLevelCheckBox">Automatisch levelen (Beta)</label>
-      <input type="checkbox" id="autoLevelCheckBox" name="autoLevel" value="1">
-  </div>
+<div class="check-row">
+    <label for="autoLevelCheckBox">Automatisch levelen (Beta)</label>
+    <input type="checkbox" id="autoLevelCheckBox" name="autoLevel" value="1">
+</div>
 
-  <select name="autoLevel" id="autoLevel">
-      <option disabled selected value> -- select an option -- </option>
-      <option value="7">Tikkie</option>
-      <option value="8">Keld</option>
-      <option value="6">Moord</option>
-  </select>
+<select name="autoLevel" id="autoLevel">
+    <option disabled selected value> -- select an option --</option>
+    <option value="7">Tikkie</option>
+    <option value="8">Keld</option>
+    <option value="6">Moord</option>
+</select>
 
 
-  <button id="saveSettingsButton">Opslaan</button>
-  <p id="status"></p>
+<button id="saveSettingsButton">Opslaan</button>
+<p id="status"></p>
 
-  <script src="js/popup.js"></script>
+<script src="js/popup.js"></script>
 </body>
 
 </html>

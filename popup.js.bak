@@ -1,3 +1,0 @@
-document.getElementById("knop").addEventListener("click", () => {
-  alert("Knop geklikt!");
-});

@@ -12,11 +12,11 @@ chrome.storage.sync.get("power", (data) => {
 
   rows.forEach((row) => {
     const speler = row.querySelector("td:nth-child(2)");
-    const heeftSchildje = speler && speler.querySelector('img[src="./bulletstar-icons/shield_add.png"]') !== null;
-    const familie = speler.querySelector('img[src="bulletstar-icons/user_green.png"]') !== null;
+    const isProtected = speler && speler.querySelector('img[src="./bulletstar-icons/shield_add.png"]') !== null;
+    const family = speler.querySelector('img[src="bulletstar-icons/user_green.png"]') !== null;
 
-    if (heeftSchildje) return;
-    if (familie) return;
+    if (isProtected) return;
+    if (family) return;
 
     const targetCell = row.querySelector("td:nth-child(4)");
     if (!targetCell) return;
@@ -34,8 +34,6 @@ chrome.storage.sync.get("power", (data) => {
   });
 });
 
-let captchaCache = JSON.parse(localStorage.getItem("captchaCache") || "{}");
-
 async function getBase64DataUrl(imgElement) {
     const canvas = document.createElement("canvas");
     canvas.width = imgElement.width;
@@ -45,92 +43,87 @@ async function getBase64DataUrl(imgElement) {
     return canvas.toDataURL("image/png");
 }
 
-//voor mass toevoegen op de code.php pagina
-async function ezCaptcha() {
-    const img = document.querySelector("img");
-    const dataUrl = await getBase64DataUrl(img);
-
-    const response = await fetch("https://api.openai.com/v1/responses", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${API_KEY}`,
-        },
-        body: JSON.stringify({
-            model: "gpt-5-nano",
-            input: [
-                {
-                    role: "user",
-                    content: [
-                        { type: "input_text", text: "Lees de code in deze afbeelding, geef de code terug als alleen de cijfers." },
-                        { type: "input_image", image_url: dataUrl },
-                    ],
-                },
-            ],
-        }),
+function getThumbnail(dataUrl) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = 50;
+            canvas.height = 50;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, 50, 50);
+            resolve(canvas.toDataURL("image/png"));
+        };
+        img.src = dataUrl;
     });
+}
 
-    const result = await response.json();
-    console.log("Gelezen captcha:", result?.output?.[1]?.content?.[0]?.text);
-
-    captchaCache[dataUrl] = result?.output?.[1]?.content?.[0]?.text;
-    localStorage.setItem("captchaCache", JSON.stringify(captchaCache));
-
-    window.location.reload();
+async function hashDataUrl(dataUrl) {
+    const data = dataUrl.split(",")[1];
+    const byteStr = atob(data);
+    const bytes = new Uint8Array(byteStr.length);
+    for (let i = 0; i < byteStr.length; i++) bytes[i] = byteStr.charCodeAt(i);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", bytes);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 async function autoFillCaptcha() {
-     chrome.storage.sync.get("autoCaptcha", async (data) => {
-        const autoCaptcha = data.autoCaptcha;
-
-        if (!autoCaptcha) {
-            return;
-        }
+    chrome.storage.sync.get("autoCaptcha", async (data) => {
+        if (!data.autoCaptcha) return;
 
         const img = document.querySelector("#captchaImage");
         const input = document.querySelector('input[name="code"]');
         if (!img || !input) return;
 
         const dataUrl = await getBase64DataUrl(img);
+        const hash = await hashDataUrl(dataUrl);
+        const thumb = await getThumbnail(dataUrl);
 
-        if (captchaCache[dataUrl]) {
-            console.log("Captcha uit cache:", captchaCache[dataUrl]);
-            input.value = captchaCache[dataUrl];
-            return;
-        }
+        chrome.storage.local.get("captchaCache", async (result) => {
+            const captchaCache = result.captchaCache || {};
 
-        const response = await fetch("https://api.openai.com/v1/responses", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${API_KEY}`,
-            },
-            body: JSON.stringify({
-                model: "gpt-5-nano",
-                input: [
-                    {
-                        role: "user",
-                        content: [
-                            {
-                                type: "input_text",
-                                text: "Lees de code in deze afbeelding, geef de code terug als alleen de cijfers."
-                            },
-                            {type: "input_image", image_url: dataUrl},
-                        ],
-                    },
-                ],
-            }),
+            if (captchaCache[hash]) {
+                input.value = captchaCache[hash].code;
+                return;
+            }
+
+            const response = await fetch("https://api.openai.com/v1/responses", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${API_KEY}`,
+                },
+                body: JSON.stringify({
+                    model: "gpt-5-nano",
+                    input: [
+                        {
+                            role: "user",
+                            content: [
+                                {
+                                    type: "input_text",
+                                    text: "Lees de code in deze afbeelding, geef de code terug als alleen de cijfers."
+                                },
+                                {type: "input_image", image_url: dataUrl},
+                            ],
+                        },
+                    ],
+                }),
+            });
+
+            const code = await response.json();
+            const text = code?.output?.[1]?.content?.[0]?.text || "";
+            console.log("Gelezen captcha:", text);
+
+            input.value = text;
+
+            // Opslaan: hash -> {code, thumbnail}
+            captchaCache[hash] = { code: text, thumbnail: thumb };
+            chrome.storage.local.set({ captchaCache }, () => {
+                console.log("Captcha cache opgeslagen met hash en thumbnail!");
+            });
         });
-
-        const result = await response.json();
-        const text = result?.output?.[1]?.content?.[0]?.text || "";
-        console.log("Gelezen captcha:", text);
-
-        input.value = text;
-
-        captchaCache[dataUrl] = text;
-        localStorage.setItem("captchaCache", JSON.stringify(captchaCache));
-    })
+    });
 }
 
 function autoCrime() {
@@ -204,7 +197,6 @@ function addCaptchaButton() {
         input.insertAdjacentElement("afterend", button);
     })
 }
-
 
 window.addEventListener('load', autoCrime);
 window.addEventListener('load', autoFillCaptcha);

@@ -11,6 +11,10 @@
     "default_popup": "popup.html",
     "default_icon": "icon.png"
   },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "background": {
     "service_worker": "js/background.js"
   },
@@ -18,7 +22,7 @@
     {
       "matches": ["<all_urls>"],
       "js": ["tesseract.min.js", "js/functions.js", "js/content.js", "js/config.js"],
-      "css": ["custom.css"]
+      "css": ["Assets/Stylesheets/custom.css"]
     }
   ],
   "web_accessible_resources": [
