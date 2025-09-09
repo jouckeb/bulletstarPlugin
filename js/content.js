@@ -201,7 +201,6 @@ function addCaptchaButton() {
 }
 
 window.addEventListener('load', autoCrime);
-// window.addEventListener('load', autoJailbreak);
 window.addEventListener('load', autoFillCaptcha);
 window.addEventListener('load', addCaptchaButton);
 window.addEventListener('load', autoFillPower);
