@@ -16,9 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const cache = data.captchaCache || {};
             tableBody.innerHTML = "";
 
-            const cacheObject = Object.entries(cache).sort((a, b) => a[1].code - b[1].code);
-
-            for (const [hash, entry] of cacheObject) {
+            for (const [hash, entry] of Object.entries(cache)) {
                 const tr = document.createElement("tr");
 
                 // Thumbnail
